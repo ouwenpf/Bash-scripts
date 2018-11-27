@@ -94,7 +94,7 @@ else
 	echo "MySQL startup failed"
 fi
 
-if [ $? -eq 0 ];then
+if [ -f /tmp/mysql$1.sock ];then
 	/usr/local/mysql/bin/mysql  -S /tmp/mysql$1.sock  -e  'set global super_read_only=0;alter user user() identified by "123456";'
 	if [ $? -eq 0 ];then
 		echo "MySQL Password setting is successful"
