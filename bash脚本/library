@@ -1,0 +1,86 @@
+#########################################################################
+# File Name: library
+# Author: tanyueyun
+# mail: 83357697@qq.com
+# Created Time: 2016年11月21日 星期一 00时45分04秒
+#########################################################################
+#!/bin/bash
+. /etc/init.d/functions
+
+function user_add(){
+for user in $@
+do
+
+        PASSWD=`openssl rand -base64 32 | cksum | cut -c1-6`
+        if id $user &>/dev/null;then
+                action  "$user is exist"  /bin/false
+        else
+                useradd $user &>/dev/null
+                echo "$PASSWD"|passwd --stdin $user &>/dev/null
+                if [ $? -eq 0 ];then
+                        action  "useradd $user"  /bin/true
+                        echo "$(date +%F\ %T) $user:$PASSWD" >> $HOME/.user.txt
+                else
+                        action "useradd $user"  /bin/false  
+                        echo "$(date +%F\ %T) $user:$PASSWD" >> $HOME/.fail_user.txt
+                fi
+       fi
+done
+#user_add $@
+}
+
+function rand(){
+    [ $# -eq 0 ]&& exit
+    expr $1 + $2 &>/dev/null
+    [ $? -ne 0 ]&& exit
+    min=$1
+    max=$(($2-$min+1))
+    num=`openssl rand -base64 8|cksum|cut -d " " -f1`
+    echo $(($num%$max+$min))
+
+#rand $1 $2
+}
+
+
+
+function check_ip(){
+
+
+        num=`echo  "$1"|awk  -F "." '{if(NF!=4){print "1"}}'`
+        [ -z $num ] ||{ 
+        echo "IP input error" 
+        exit
+        }
+
+
+        for i in {1..4}
+        do
+
+
+                num=`echo "$1"|awk -F "." '{print $"'$i'"}'`
+                expr $num + 1 &>/dev/null ||{
+                        echo "IP input error"
+                        exit
+                        }
+                if [ -z $num ];then 
+                        echo "IP input error"
+                        exit
+
+                elif [ $num -gt 255 ]; then
+                        echo "IP input error"
+
+               elif [ ${#num} -gt 1 -a  ${num:0:1} -eq 0 ];then
+
+                         echo "IP input error"
+                        
+                fi
+
+
+        done
+
+
+#check_ip $1
+}
+
+
+

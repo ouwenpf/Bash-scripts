@@ -1,0 +1,92 @@
+#!/bin/sh
+# chkconfig: 2345 54 98
+# description:ignore
+. /etc/init.d/functions
+nginx="/bswifi/server/nginx/sbin/nginx"
+prog="nginx"
+RETVAL=0
+
+ens(){
+	sensitive="`echo $*|tr "[A-Z]" "[a-z]"`"
+	echo "$sensitive"
+}
+
+start() {
+	[ ! -f /var/lock/subsys/$prog ] && {
+	$nginx && RETVAL=$?
+	if [ $RETVAL -eq 0 ] ; then
+		touch /var/lock/subsys/$prog
+		action "Starting $prog" /bin/true
+	else
+		action "Starting $prog" /bin/false
+	fi
+	}
+	return $RETVAL
+}
+
+stop() {
+	[ -f /var/lock/subsys/$prog ] && {
+        $nginx -s stop && RETVAL=$?
+	if [ $RETVAL -eq 0 ] ; then
+                rm -f /var/lock/subsys/$prog
+                action "$prog is Stopped" /bin/true
+        fi
+	}||{
+	action "$prog is Stopped" /bin/false
+	exit
+	}
+        return $RETVAL
+        
+}
+
+reload() {
+	[ -f /var/lock/subsys/$prog ] && {
+        $nginx -s reload && RETVAL=$?
+	action "$prog is reloading" /bin/true
+	}||{
+		echo -e  "\033[31m$prog is Stopped,please start $prog \033[0m" 
+	}
+	return $RETVAL
+        
+}
+
+
+status() {
+        [ -f /var/lock/subsys/$prog ] && {
+		echo -e  "\033[32m$prog is Starting\033[0m" 
+        }||{
+
+                echo -e  "\033[31m$prog is Stopped \033[0m" 
+        }
+        return $RETVAL
+
+}
+
+
+case `ens $*` in 
+ start)
+	start
+	;;
+
+ stop)
+        stop 
+        ;;
+
+
+ restart)
+        stop
+	start 
+        ;;
+
+ reload)
+        reload 
+        ;;
+ status)
+        status
+        ;;
+ *)
+	echo "USAGE: $0 {start|stop|restart|reload|status}"
+	;;
+esac
+
+exit $RERVAL 
