@@ -11,14 +11,14 @@ prompt="\\u@\\h [\\d]>"
 ####: for global
 user                                =mysql                          #	mysql
 basedir                             =/usr/local/mysql/              #	/usr/local/mysql/
-datadir                             =/data/mysql/mysql3311/data     #	/usr/local/mysql/data
+datadir                             =/data/mysql/mysql3306/data     #	/usr/local/mysql/data
 server_id                           =113306                         #	0
 port                                =3306                           #	3306
 character_set_server                =utf8                           #	latin1
 explicit_defaults_for_timestamp     =off                            #    off
 log_timestamps                      =system
 default_time_zone		            ='+8:00'                        #	utc
-socket                              =/tmp/mysql3311.sock            #	/tmp/mysql.sock
+socket                              =/tmp/mysql3306.sock            #	/tmp/mysql.sock
 read_only                           = 1                             #   off
 super_read_only                     = 1
 skip_name_resolve                   =off                            #   0
@@ -35,7 +35,7 @@ table_open_cache_instances          =64                             #   16
 max_prepared_stmt_count             =1048576                        #
 
 ####: for binlog
-binlog_format                       =row                          #	row
+binlog_format                       =row                            #	row
 log_bin                             =/data/mysql/mysql3306/logs/mysql-bin                      #	off
 binlog_rows_query_log_events        =on                             #	off
 log_slave_updates                   =on                             #	off
@@ -65,7 +65,7 @@ enforce_gtid_consistency            =on                            #	off
 
 ####: for replication
 skip_slave_start                     =1                             #
-#master_info_repository              =table                         #	file
+master_info_repository               =table                         #	file
 relay_log_info_repository            =table                         #	file
 relay_log_recovery					 =1								#   0
 sync_relay_log						 =1								#   10000
