@@ -83,6 +83,10 @@ binlog_group_commit_sync_no_delay_count = 10                        #    0
 #binlog_order_commits				 =off							#	 0
 slave_net_timeout					 =15							#	 60
 
+####: for write_set
+binlog_transaction_dependency_tracking         =writeset_session			#  write_set
+transaction_write_set_extraction               =XXHASH64					#  XXHASH64
+
 ####: for innodb
 innodb_data_file_path                           =ibdata1:100M:autoextend    #	ibdata1:12M:autoextend
 innodb_temp_data_file_path                      =ibtmp1:12M:autoextend      #	ibtmp1:12M:autoextend
