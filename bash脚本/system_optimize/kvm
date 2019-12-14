@@ -1,0 +1,22 @@
+#/bin/bash
+#
+
+address=`ip a  show eth0|awk -F '[ ]+' '/link\/ether/{print $3}'`
+
+function edit_address(){
+	
+	for i in /etc/libvirt/qemu/*.xml;do
+	
+		virtual_address=`awk  -F "[ =']+"  '/mac address/{print $4}'  $i`
+		
+		if [ "${virtual_address}" != "${address}" ];then
+			sed -ri  "s/mac address='${virtual_address}'/mac address='${address}'/"   $i 
+			/usr/bin/virsh define $i  &> /dev/null
+		fi
+		
+	done
+
+
+}
+
+edit_address

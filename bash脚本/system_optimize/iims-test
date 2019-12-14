@@ -1,0 +1,41 @@
+#!/bin/sh
+
+PORT1=${1-:8336}
+PORT2=${2-:8337}
+
+[ `ps  aux|egrep "nginx|/bswifi/server/php/bin/php|php-fpm"|grep -v "grep"|wc -l` -eq 0 ] && exit 
+TCP=`ps  aux|egrep "/bswifi/server/php/bin/php"|grep -v "grep"|wc -l`
+HTTP=`ps  aux|egrep "php-fpm"|grep -v "grep"|wc -l`
+STATIC=`ps  aux|egrep "nginx"|grep -v "grep"|wc -l`
+CPUS=`lscpu |awk -F "[ ]+" '$1=="CPU(s):"{print $2}'`
+MemTotal=`free -m|awk -F "[ ]+" '$1=="Mem:" {printf "%d", $2*0.8}'`
+
+
+Total=`ps  aux|egrep "/bswifi/server/php/bin/php|php-fpm|nginx"|grep -v "grep"|wc -l`
+IimsTotal=`ps  aux|egrep "nginx|/bswifi/server/php/bin/php|php-fpm"|grep -v "grep"|awk '{b+=$6}END{printf "%.2f", b/(1024)}'`
+CPU_Percentage=`ps  aux|egrep "nginx|/bswifi/server/php/bin/php|php-fpm"|grep -v "grep"|awk '{a+=$3}END{printf "%.2f",  a/('$CPUS')}'`
+
+SOCKET_TCP=`ss -t -a|egrep "$PORT1|$PORT2"|grep ESTAB|wc -l`
+
+Colour_CM(){
+    if [ ${SOCKET_TCP} -eq 0 ];then
+	echo "Check whether the port is correct or equipment number exists"
+    fi
+    AVG=`awk 'BEGIN{print '$IimsTotal/${SOCKET_TCP}'}'`
+    Max_Device=`awk 'BEGIN{printf "%d", '$MemTotal/$AVG'}'`
+    echo -e "\E[36;1mCPU:${CPU_Percentage}%		\E{SOCKET_TCP:${SOCKET_TCP}\E[0m"
+    echo -e "\E[36;1mMem:${IimsTotal}/${MemTotal}MB     \Ebswifi:$Total\E[0m"
+    echo -e "============================================================"
+    echo -e "\E[36;1mMax_Device:${Max_Device}\E[0m"
+}
+
+
+Colour_Connect(){
+    echo -e "\E[36;1mTCP:$TCP\E[0m"
+    echo -e "\E[36;1mHTTP:$HTTP\E[0m"
+    echo -e "\E[36;1mSTATIC:$STATIC\E[0m" 
+
+}
+
+Colour_CM
+
