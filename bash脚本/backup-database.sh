@@ -20,3 +20,17 @@ do
 	fi
 done
 
+
+
+echo "start:`date +%Y%m%d%H%M%S`"
+mysqldump --login-path=3306 --master-data=2 --single-transaction -A|gzip >game_all.`date +%Y%m%d`.sql.gz
+
+backup(){
+        dbname=`mysql --login-path=3306 -e 'show databases;'|egrep -v 'Database|information_schema|mysql|performance_schema'`
+        for i in $dbname
+        do
+                mysqldump --login-path=3306 --master-data=2 --single-transaction -B $i|gzip > $i.`date +%Y%m%d`.sql.gz
+        done
+}
+
+echo "stop:`date +%Y%m%d%H%M%S`"
